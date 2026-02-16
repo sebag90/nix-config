@@ -10,7 +10,7 @@ EOF
 WORKDIR /build-dir
 COPY . .
 
-COPY <<'EOF' /build-dir/nix/build_container.sh
+COPY <<'EOF' /build-dir/build_container.sh
 ARCH=$(uname -m)
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 SYSTEM="${ARCH}-${OS}"
@@ -51,22 +51,3 @@ RUN mkdir -p /out/root \
 # config
 RUN mkdir -p /out/root \
  && cp -rL /root/.config /out/root/.config
-
-FROM debian:trixie-slim AS runner
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    bash \
- && rm -rf /var/lib/apt/lists/*
-
-# copy nix files
-COPY --from=builder /out/nix /nix
-COPY --from=builder /out/root /root
-COPY --from=builder /out/root/.config /root/.config
-COPY --from=builder /out/root/.nix-profile /root/.nix-profile
-
-ENV HOME=/root \
-    PATH=/root/.nix-profile/bin:/bin:/usr/bin \
-    LANG=C.UTF-8
-
-WORKDIR /workspace
-ENTRYPOINT ["fish"]
