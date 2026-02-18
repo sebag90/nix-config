@@ -8,7 +8,7 @@
   };
 
   imports = [
-    ../common/dotfiles.nix
+    # ../common/dotfiles.nix
     ../common/packages.nix
     ../common/minimal_packages.nix
     ../common/modules

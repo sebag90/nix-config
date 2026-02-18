@@ -21,6 +21,7 @@
     ctop
     ouch
     gdu
+    stow
 
     # programming
     devpod
