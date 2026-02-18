@@ -43,7 +43,7 @@
             dotfiles = inputs.dotfiles;
             helix = inputs.helix;
             goosebutils = inputs.goosebutils;
-            dotfiles_dir = ".config/dotfiles";
+            dotfiles_dir = ".config/nix-config";
             inherit hostname;
           };
           modules = [ ./hosts/common/allowunfree.nix homeFile ];
@@ -116,7 +116,7 @@
                 dotfiles = inputs.dotfiles;
                 helix = inputs.helix;
                 goosebutils = inputs.goosebutils;
-                dotfiles_dir = ".config/dotfiles";
+                dotfiles_dir = ".config/nix-config";
                 hostname = "mac";
               };
             }
