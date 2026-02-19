@@ -46,8 +46,23 @@ RUN mkdir -p /out/nix/var/nix \
 
 # home
 RUN mkdir -p /out/root \
- && cp -r /root/.nix-profile /out/root/.nix-profile
+ && cp -r /root/.nix-profile /out/.nix-profile
 
-# config
-RUN mkdir -p /out/root \
- && cp -rL /root/.config /out/root/.config
+FROM alpine AS runner
+
+# copy nix files
+COPY --from=builder /out/nix /nix
+COPY --from=builder /out/.nix-profile /nix-profile
+
+ENV PATH=/nix-profile/bin:$PATH \
+    LANG=C.UTF-8
+
+
+WORKDIR /dotfiles
+RUN git clone https://github.com/sebag90/dotfiles.git
+WORKDIR /dotfiles/dotfiles
+RUN mkdir -p $HOME/.config
+RUN stow -t $HOME/.config config
+
+WORKDIR /workspace
+ENTRYPOINT ["fish"]
