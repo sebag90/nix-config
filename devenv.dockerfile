@@ -57,7 +57,6 @@ COPY --from=builder /out/.nix-profile /nix-profile
 ENV PATH=/nix-profile/bin:$PATH \
     LANG=C.UTF-8
 
-
 WORKDIR /dotfiles
 RUN git clone https://github.com/sebag90/dotfiles.git
 WORKDIR /dotfiles/dotfiles
