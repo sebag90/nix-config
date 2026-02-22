@@ -46,22 +46,28 @@ RUN mkdir -p /out/nix/var/nix \
 
 # home
 RUN mkdir -p /out/root \
- && cp -r /root/.nix-profile /out/.nix-profile
+ && cp -r /root/.nix-profile /out/nix-profile
+
+# config
+RUN cp -rL /root/.config /out/config/
 
 FROM alpine AS runner
 
 # copy nix files
 COPY --from=builder /out/nix /nix
-COPY --from=builder /out/.nix-profile /nix-profile
+COPY --from=builder /out/nix-profile /nix/profile
+COPY --from=builder /out/config /nix/config
 
-ENV PATH=/nix-profile/bin:$PATH \
+ENV PATH=/nix/profile/bin:$PATH \
     LANG=C.UTF-8
 
-WORKDIR /dotfiles
+WORKDIR /
 RUN git clone https://github.com/sebag90/dotfiles.git
-WORKDIR /dotfiles/dotfiles
-RUN mkdir -p $HOME/.config
-RUN stow -t $HOME/.config config
+WORKDIR /dotfiles
+
+# create .config as a mix of nix's modules and dotfiles
+RUN cp -rs /nix/config $HOME/.config
+RUN stow --no-folding -t $HOME/.config config
 
 WORKDIR /workspace
 ENTRYPOINT ["fish"]

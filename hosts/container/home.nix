@@ -8,7 +8,6 @@
   programs.git.enable = true;
 
   imports = [
-    ../common/dotfiles.nix
     ../common/minimal_packages.nix
     ../common/modules
   ];
