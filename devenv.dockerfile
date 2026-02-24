@@ -51,19 +51,26 @@ RUN mkdir -p /out/root \
 # config
 RUN cp -rL /root/.config /out/config/
 
-FROM alpine AS runner
 
+FROM alpine AS aggregator
 # copy nix files
 COPY --from=builder /out/nix /nix
 COPY --from=builder /out/nix-profile /nix/profile
 COPY --from=builder /out/config /nix/config
 
+
+FROM alpine AS final
+COPY --from=aggregator /nix /nix
+
 ENV PATH=/nix/profile/bin:$PATH \
     LANG=C.UTF-8
 
-WORKDIR /
 RUN git clone https://github.com/sebag90/dotfiles.git
 WORKDIR /dotfiles
+
+# create a non root user
+RUN addgroup -S devgroup && adduser -S devuser -G devgroup
+USER devuser
 
 # create .config as a mix of nix's modules and dotfiles
 RUN cp -rs /nix/config $HOME/.config

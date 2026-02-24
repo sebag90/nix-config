@@ -53,3 +53,16 @@ loginctl enable-linger $USER
 * reload rules: `$ sudo udevadm control --reload-rules && sudo udevadm trigger`
 
 Solaar should now work for non sudo user
+
+# Building containers
+ARG AGGREGATOR_IMAGE=alpine
+
+FROM ${AGGREGATOR_IMAGE} AS aggregator
+
+
+build all: docker build -t myimage .
+
+only final:
+docker build \
+  --build-arg AGGREGATOR_IMAGE=ghcr.io/yourname/nix-aggregator:2026-02 \
+  -t myimage .
