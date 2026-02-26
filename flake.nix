@@ -28,7 +28,7 @@
   };
 
   outputs =
-    inputs@{ nixpkgs, home-manager, nix-darwin, flake-utils, solaar, ... }:
+    inputs@{ self, nixpkgs, home-manager, nix-darwin, flake-utils, solaar, ... }:
     let
       mkPkgs = system:
         import nixpkgs {
@@ -48,81 +48,108 @@
           };
           modules = [ ./hosts/common/allowunfree.nix homeFile ];
         };
-    in flake-utils.lib.eachDefaultSystem (system: {
-      ## ─────────────────────────────────────────────
-      ## Home Manager
-      ## ─────────────────────────────────────────────
-      homeConfigurations = {
-        container = mkHome {
+    in flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = mkPkgs system;
+
+        containerHome = mkHome {
           inherit system;
           hostname = "container";
           homeFile = ./hosts/container/home.nix;
         };
+      in
+      {
+        ## ─────────────────────────────────────────────
+        ## Home Manager
+        ## ─────────────────────────────────────────────
+        homeConfigurations = {
+          container = containerHome;
 
-        headless = mkHome {
-          inherit system;
-          hostname = "headless";
-          homeFile = ./hosts/headless/home.nix;
+          headless = mkHome {
+            inherit system;
+            hostname = "headless";
+            homeFile = ./hosts/headless/home.nix;
+          };
+
+          laptop = mkHome {
+            inherit system;
+            hostname = "laptop";
+            homeFile = ./hosts/laptop/home.nix;
+          };
         };
 
-        laptop = mkHome {
-          inherit system;
-          hostname = "laptop";
-          homeFile = ./hosts/laptop/home.nix;
+        ## ─────────────────────────────────────────────
+        ## Dev Container Image (OCI)
+        ## ─────────────────────────────────────────────
+        packages.devImage =
+          pkgs.dockerTools.buildLayeredImage {
+            name = "seba-dev";
+            tag = "latest";
+
+            contents = [
+              containerHome.activationPackage
+            ];
+
+            config = {
+              Cmd = [ "${pkgs.fish}/bin/fish" ];
+              WorkingDir = "/workspace";
+              Env = [
+                "LANG=C.UTF-8"
+                "HOME=/root"
+              ];
+            };
+          };
+      }) // {
+        ## ─────────────────────────────────────────────
+        ## NixOS
+        ## ─────────────────────────────────────────────
+        nixosConfigurations = {
+          nixos = nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [
+              ./hosts/nixos/configuration.nix
+              ./hosts/nixos/hardware-configuration.nix
+              ./hosts/common/allowunfree.nix
+
+              solaar.nixosModules.default
+              home-manager.nixosModules.home-manager
+
+              {
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.seba = import ./hosts/nixos/home.nix;
+              }
+            ];
+          };
+        };
+
+        ## ─────────────────────────────────────────────
+        ## macOS (nix-darwin)
+        ## ─────────────────────────────────────────────
+        darwinConfigurations = {
+          mac = nix-darwin.lib.darwinSystem {
+            system = "aarch64-darwin";
+            modules = [
+              ./hosts/mac/configuration.nix
+              ./hosts/common/allowunfree.nix
+
+              home-manager.darwinModules.home-manager
+
+              {
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.sebastiano = import ./hosts/mac/home.nix;
+
+                home-manager.extraSpecialArgs = {
+                  dotfiles = inputs.dotfiles;
+                  helix = inputs.helix;
+                  goosebutils = inputs.goosebutils;
+                  dotfiles_dir = ".config/nix-config";
+                  hostname = "mac";
+                };
+              }
+            ];
+          };
         };
       };
-    }) // {
-      ## ─────────────────────────────────────────────
-      ## NixOS
-      ## ─────────────────────────────────────────────
-      nixosConfigurations = {
-        nixos = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./hosts/nixos/configuration.nix
-            ./hosts/nixos/hardware-configuration.nix
-            ./hosts/common/allowunfree.nix
-
-            solaar.nixosModules.default
-            home-manager.nixosModules.home-manager
-
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.seba = import ./hosts/nixos/home.nix;
-            }
-          ];
-        };
-      };
-
-      ## ─────────────────────────────────────────────
-      ## macOS (nix-darwin)
-      ## ─────────────────────────────────────────────
-      darwinConfigurations = {
-        mac = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          modules = [
-            ./hosts/mac/configuration.nix
-            ./hosts/common/allowunfree.nix
-
-            home-manager.darwinModules.home-manager
-
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.sebastiano = import ./hosts/mac/home.nix;
-
-              home-manager.extraSpecialArgs = {
-                dotfiles = inputs.dotfiles;
-                helix = inputs.helix;
-                goosebutils = inputs.goosebutils;
-                dotfiles_dir = ".config/nix-config";
-                hostname = "mac";
-              };
-            }
-          ];
-        };
-      };
-    };
-
 }
