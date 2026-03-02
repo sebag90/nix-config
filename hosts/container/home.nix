@@ -8,7 +8,10 @@
   programs.git.enable = true;
 
   imports = [
-    ../common/minimal_packages.nix
+    ../common/cli_tools.nix
+    ../common/editor.nix
+    ../common/programming_tools.nix
+    ../common/containers.nix
     ../common/modules
   ];
 
