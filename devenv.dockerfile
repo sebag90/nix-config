@@ -8,7 +8,8 @@ experimental-features = nix-command flakes
 EOF
 
 WORKDIR /build-dir
-COPY . .
+COPY flake.nix .
+COPY hosts hosts
 
 COPY <<'EOF' /build-dir/build_container.sh
 ARCH=$(uname -m)
@@ -58,23 +59,20 @@ COPY --from=builder /out/nix /nix
 COPY --from=builder /out/nix-profile /nix/profile
 COPY --from=builder /out/config /nix/config
 
+FROM fedora AS final
+ARG WORK_DIR=/workspace
 
-FROM alpine AS final
 COPY --from=aggregator /nix /nix
 
 ENV PATH=/nix/profile/bin:$PATH \
     LANG=C.UTF-8
 
+# RUN sudo dnf install git -y
 RUN git clone https://github.com/sebag90/dotfiles.git
 WORKDIR /dotfiles
-
-# create a non root user
-RUN addgroup -S devgroup && adduser -S devuser -G devgroup
-USER devuser
 
 # create .config as a mix of nix's modules and dotfiles
 RUN cp -rs /nix/config $HOME/.config
 RUN stow --no-folding -t $HOME/.config config
-
-WORKDIR /workspace
+WORKDIR $WORK_DIR
 ENTRYPOINT ["fish"]

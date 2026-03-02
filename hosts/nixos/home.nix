@@ -10,7 +10,13 @@
   imports = [
     ../common/dotfiles.nix
     ../common/packages.nix
-    ../common/minimal_packages.nix
+    ../common/cli_tools.nix
+    ../common/editor.nix
+    ../common/programming_tools.nix
+    ../common/containers.nix
+    ../common/programming_languages.nix
+    ../common/containers.nix
+    ../common/gui_tools.nix
     ../common/modules
     ./packages.nix
   ];
