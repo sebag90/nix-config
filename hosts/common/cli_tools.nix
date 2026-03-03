@@ -28,8 +28,8 @@
     stow
 
     # productivity
-    yazi
-    yaziPlugins.git
+    # yazi
+    # yaziPlugins.git
     zellij
   ];
 }
