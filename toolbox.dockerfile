@@ -1,4 +1,4 @@
-FROM ghcr.io/sebag90/devenv:0.3.0 as builder
+FROM ghcr.io/sebag90/devenv:latest as builder
 FROM registry.fedoraproject.org/fedora-toolbox:43 as runner
 
 # copy nix files
