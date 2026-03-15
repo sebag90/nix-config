@@ -53,11 +53,14 @@ RUN mkdir -p /out/root \
 RUN cp -rL /root/.config /out/config/
 
 
-FROM alpine AS aggregator
+FROM fedora AS aggregator
 # copy nix files
 COPY --from=builder /out/nix /nix
 COPY --from=builder /out/nix-profile /nix/profile
 COPY --from=builder /out/config /nix/config
+
+# clean broken links
+RUN find /nix -xtype l -delete
 
 FROM fedora AS final
 ARG WORK_DIR=/workspace
@@ -67,7 +70,6 @@ COPY --from=aggregator /nix /nix
 ENV PATH=/nix/profile/bin:$PATH \
     LANG=C.UTF-8
 
-# RUN sudo dnf install git -y
 RUN git clone https://github.com/sebag90/dotfiles.git
 WORKDIR /dotfiles
 
