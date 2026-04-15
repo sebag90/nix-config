@@ -80,4 +80,4 @@ docker build \
   location = "localhost:5000"
   insecure = true
   ```
-* sudo rpm-ostree rebase ostree-unverified-registry:localhost:5000/myimage:latest
+* rebase `$ sudo rpm-ostree rebase ostree-unverified-registry:localhost:5000/sebos:latest`
