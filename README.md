@@ -66,3 +66,18 @@ only final:
 docker build \
   --build-arg AGGREGATOR_IMAGE=ghcr.io/yourname/nix-aggregator:2026-02 \
   -t myimage .
+
+# SebOS
+* install Fedora silverblue
+* remove Firefox: rpm-ostree override remove firefox firefox-langpacks
+* install Firefox from flathub (contains all codecs)
+* run docker registry: `$ podman run -d -p 5000:5000 registry:2`
+* build the image: `$ podman build -t localhost:5000/seboy:latest -f distro.containerfile .`
+* push the image to local registry
+* modify: /etc/containers/registries.conf:
+  ```
+  [[registry]]
+  location = "localhost:5000"
+  insecure = true
+  ```
+* sudo rpm-ostree rebase ostree-unverified-registry:localhost:5000/myimage:latest
