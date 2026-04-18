@@ -9,7 +9,7 @@ EOF
 
 WORKDIR /build-dir
 COPY flake.nix .
-COPY hosts hosts
+COPY packages packages
 
 COPY <<'EOF' /build-dir/build_container.sh
 ARCH=$(uname -m)
@@ -19,7 +19,7 @@ SYSTEM="${ARCH}-${OS}"
 nix build \
   --option sandbox false \
   --option filter-syscalls false \
-  .#homeConfigurations.${SYSTEM}.container.activationPackage
+  .#container
 EOF
 
 RUN bash build_container.sh
