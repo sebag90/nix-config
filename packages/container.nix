@@ -2,8 +2,11 @@
 
 with pkgs; [
   # container tools
-  podman podman-tui podlet dive lazydocker
+  # podman
+  # podman-tui
+  # dive
+  # lazydocker
   
-  # programming languages
-  nodejs go
+  # # programming languages
+  # nodejs go
 ]

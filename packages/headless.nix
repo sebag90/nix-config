@@ -1,13 +1,28 @@
 { pkgs, helix, goosebutils, system }:
 
 with pkgs; [
-  # goosebutils
+  goosebutils
   goosebutils.packages.${system}.search
   goosebutils.packages.${system}.dstroy
   goosebutils.packages.${system}.devenver
 
   # cli tools
-  wget curl bat eza unzip serpl glow usbutils btop ctop ouch gdu stow zellij zsh fish
+  wget
+  curl
+  bat
+  eza
+  unzip
+  serpl
+  glow
+  usbutils
+  btop
+  ctop
+  ouch
+  gdu
+  stow
+  zellij
+  zsh
+  fish
 
   # editor & lsps
   helix.packages.${system}.default
@@ -17,5 +32,19 @@ with pkgs; [
   gopls
 
   # programming tools
-  git devpod lazygit just uv ty pyrefly cookiecutter pre-commit ruff python313Packages.ipython
+  podman
+  docker-compose
+  devpod
+  podlet
+  dive
+  git
+  lazygit
+  just
+  uv
+  ty
+  pyrefly
+  cookiecutter
+  pre-commit
+  ruff
+  python313Packages.ipython
 ]

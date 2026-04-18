@@ -2,7 +2,7 @@
   description = "Minimal Nix Flake for headless and container environments";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
 
     helix.url = "github:helix-editor/helix";
@@ -18,8 +18,7 @@
         };
 
         headlessPackages = import ./packages/headless.nix { inherit pkgs helix goosebutils system; };
-
-        containerPackages = headlessPackages ++ import ./packages/container.nix { inherit pkgs; };
+        # containerPackages = headlessPackages ++ import ./packages/container.nix { inherit pkgs; };
 
       in {
         packages = {
@@ -28,10 +27,10 @@
             paths = headlessPackages;
           };
 
-          container = pkgs.buildEnv {
-            name = "container-env";
-            paths = containerPackages;
-          };
+          # container = pkgs.buildEnv {
+          #   name = "container-env";
+          #   paths = containerPackages;
+          # };
 
           default = pkgs.buildEnv {
             name = "default-env";
