@@ -7,30 +7,12 @@ experimental-features = nix-command flakes
 ```
 
 ## Headless and laptop install
-**ON FEDORA**: first activate daemon: `sudo systemctl enable --now nix-daemon`
+**ON FEDORA**: first activate daemon: `sudo systemctl enable --now nix-daemon` and add the user to the nix group: `nix-users`
 
 
 * cd into `cd dotfiles/nix/`
-* run `$ nix run .#homeConfigurations.<system>.<headless | laptop>.activationPackage`
-
-`<system>` ist the architecture (eg. x86_64-linux, check dockerfile for how to build automatically)
-
-## NIX secret file
-inside the directory of the host, create a `secrets.nix` (`dotfiles/nix/hosts/nixos/secrets.nix`):
-```
-{
-  userEmail = "myemail@secrets.com";
-}
-```
-
-and make sure to add the variable `DOTFILES_SECRETS` to your zsh config (`nixos/hosts/nixos/modules/zsh.nix`):
-```
-sessionVariables = {
-  ZSH_CUSTOM = "${config.home.homeDirectory}/.config/zsh";
-  NIX_BUILD_EXEC = "nixos-rebuild";
-  DOTFILES_SECRETS = "${config.home.homeDirectory}/code/dotfiles/nixos/hosts/nixos/secrets.nix";
-};
-```
+* run `$ nix profile install .#headless`
+* update with `$ nix profile upgrade headless`
 
 # Post Install
 
