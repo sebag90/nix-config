@@ -48,3 +48,9 @@ only final:
 docker build \
   --build-arg AGGREGATOR_IMAGE=ghcr.io/yourname/nix-aggregator:2026-02 \
   -t myimage .
+
+## creating manifest
+
+* create a manifest: `$ podman manifest create <name>:<tag>`
+* add images to manifest `$ podman manifest add <name>:<tag> <image_to_add>`
+* push `$ podman manifest push --all <name>:<tag>`

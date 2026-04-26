@@ -47,4 +47,5 @@ with pkgs; [
   pre-commit
   ruff
   python313Packages.ipython
+  nodejs
 ]
