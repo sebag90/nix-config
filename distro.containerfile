@@ -1,5 +1,5 @@
 FROM ghcr.io/sebag90/devenv:latest as nix
-FROM quay.io/fedora-ostree-desktops/silverblue:43
+FROM quay.io/fedora-ostree-desktops/silverblue:44
 
 RUN --mount=type=tmpfs,dst=/tmp \
 	wget --no-hsts https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/CascadiaCode.zip  -O /tmp/CascadiaCode.zip \

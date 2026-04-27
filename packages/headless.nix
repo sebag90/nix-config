@@ -1,5 +1,4 @@
 { pkgs, helix, goosebutils, system }:
-
 with pkgs; [
   goosebutils
   goosebutils.packages.${system}.search
