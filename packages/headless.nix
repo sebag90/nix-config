@@ -22,6 +22,7 @@ with pkgs; [
   zellij
   zsh
   fish
+  yazi
 
   # editor & lsps
   helix.packages.${system}.default
@@ -43,6 +44,7 @@ with pkgs; [
   ty
   pyrefly
   cookiecutter
+  prek
   pre-commit
   ruff
   python313Packages.ipython
