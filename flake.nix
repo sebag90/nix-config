@@ -2,7 +2,7 @@
   description = "Minimal Nix Flake for headless and container environments";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11-small";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
 
     helix.url = "github:helix-editor/helix";
