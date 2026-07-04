@@ -54,3 +54,8 @@ docker build \
 * create a manifest: `$ podman manifest create <name>:<tag>`
 * add images to manifest `$ podman manifest add <name>:<tag> <image_to_add>`
 * push `$ podman manifest push --all <name>:<tag>`
+
+
+## copy to host
+Copy /nix from the container to the host
+`docker run --rm --entrypoint=tar ghcr.io/sebag90/devenv -C / -cf - nix | sudo tar -C / -xf -`
