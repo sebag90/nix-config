@@ -23,6 +23,7 @@ with pkgs; [
   zsh
   fish
   yazi
+  delta
 
   # editor & lsps
   helix.packages.${system}.default
