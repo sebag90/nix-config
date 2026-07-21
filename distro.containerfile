@@ -8,6 +8,5 @@ RUN --mount=type=tmpfs,dst=/tmp \
 	&& tar -xzf /tmp/JuliaMono.tar.gz -C /usr/share/fonts/JuliaMono/ \
     && fc-cache -fv
 
-RUN dnf -y copr enable scottames/ghostty && dnf -y install ghostty
 COPY --from=nix /nix /nix
 RUN ["bootc", "container", "lint"]
