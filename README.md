@@ -59,3 +59,6 @@ docker build \
 ## copy to host
 Copy /nix from the container to the host
 `docker run --rm --entrypoint=tar ghcr.io/sebag90/devenv -C / -cf - nix | sudo tar -C / -xf -`
+
+## Run as working environment:
+`podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) -v $(pwd):/workspace:Z -w /workspace ghcr.io/sebag90/devenv:latest`
