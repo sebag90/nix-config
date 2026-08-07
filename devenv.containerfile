@@ -49,10 +49,6 @@ RUN mkdir -p /out/nix/var/nix \
 RUN mkdir -p /out/root \
  && cp -r /root/.nix-profile /out/nix-profile
 
-# # config
-# RUN cp -rL /root/.config /out/config/
-
-
 FROM fedora AS aggregator
 # copy nix files
 COPY --from=builder /out/nix /nix
@@ -62,20 +58,23 @@ COPY --from=builder /out/nix-profile /nix/profile
 # clean broken links
 RUN find /nix -xtype l -delete
 
+FROM docker.io/alpine/git:latest as config
+WORKDIR /workspace
+RUN git clone https://github.com/sebag90/dotfiles.git
+
 FROM fedora AS final
+
 ARG WORK_DIR=/workspace
+ARG CONFIG_DIR=/usr/local/share/config
 
 COPY --from=aggregator /nix /nix
+COPY --from=config $WORK_DIR/dotfiles/config $CONFIG_DIR
 
 ENV PATH=/nix/profile/bin:$PATH \
-    LANG=C.UTF-8
+    LANG=C.UTF-8 \
+    XDG_CONFIG_HOME=$CONFIG_DIR
 
-RUN /nix/profile/bin/git clone https://github.com/sebag90/dotfiles.git
-WORKDIR /dotfiles
+RUN chmod -R 777 $CONFIG_DIR
 
-# create .config as a mix of nix's modules and dotfiles
-# RUN cp -rs /nix/config $HOME/.config
-RUN mkdir $HOME/.config
-RUN stow --no-folding -t $HOME/.config config
 WORKDIR $WORK_DIR
 ENTRYPOINT ["fish"]
