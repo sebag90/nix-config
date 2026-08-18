@@ -9,7 +9,7 @@ with pkgs; [
   wget
   curl
   bat
-  eza
+  lsd
   unzip
   serpl
   glow
