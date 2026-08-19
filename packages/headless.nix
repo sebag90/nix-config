@@ -18,7 +18,6 @@ with pkgs; [
   ctop
   ouch
   ripgrep
-  openssh
   gdu
   stow
   zellij
