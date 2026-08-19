@@ -65,3 +65,6 @@ Copy /nix from the container to the host
 
 with podman:
 `podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) -v $(pwd):/workspace:Z -w /workspace -v $XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock -e CONTAINER_HOST=unix:///run/podman/podman.sock --security-opt label=disable ghcr.io/sebag90/devenv:latest`
+
+
+podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) -v $(pwd):/workspace:Z -w /workspace -v $XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock -e CONTAINER_HOST=unix:///run/podman/podman.sock -v ~/.pi/agent:/home/dev/.pi/agent:Z -v ~/.aws:/home/dev/.aws:Z --security-opt label=disable ciao

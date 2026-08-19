@@ -17,6 +17,8 @@ with pkgs; [
   btop
   ctop
   ouch
+  ripgrep
+  openssh
   gdu
   stow
   zellij
@@ -24,6 +26,7 @@ with pkgs; [
   fish
   yazi
   delta
+  less
 
   # editor & lsps
   helix.packages.${system}.default
