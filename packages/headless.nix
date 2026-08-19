@@ -26,7 +26,6 @@ with pkgs; [
   fish
   yazi
   delta
-  less
 
   # editor & lsps
   helix.packages.${system}.default
