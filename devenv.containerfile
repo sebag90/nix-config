@@ -21,13 +21,16 @@ ENV PATH=$VENV_DIR/bin:/nix/profile/bin:$PATH \
     VIRTUAL_ENV=$VENV_DIR \
     UV_PROJECT_ENVIRONMENT=$VENV_DIR \
     SHELL=/nix/profile/bin/fish \
-    NPM_CONFIG_PREFIX=/usr/local
+    NPM_CONFIG_PREFIX=/usr/local \
+    DEVENV=1
 
 RUN mkdir -p $HOME_DIR/.local/share $HOME_DIR/.cache \
     && echo "ALL ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/container \
     && chmod 440 /etc/sudoers.d/container
 
-# install pi coding agent (bash, git, ca-certificates and ripgrep come from fedora + nix)
+RUN dnf install -y git openssh-clients && dnf clean all
+
+# install pi coding agent (bash, ca-certificates and ripgrep come from fedora + nix)
 RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent \
     && pi install npm:pi-ponytail
 
