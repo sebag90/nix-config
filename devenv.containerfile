@@ -18,6 +18,7 @@ COPY --from=config /workspace/dotfiles/config $HOME_DIR/.config
 ENV PATH=$VENV_DIR/bin:/nix/profile/bin:$PATH \
     LANG=C.UTF-8 \
     HOME=$HOME_DIR \
+    XDG_CONFIG_HOME=$HOME_DIR/.config \
     VIRTUAL_ENV=$VENV_DIR \
     UV_PROJECT_ENVIRONMENT=$VENV_DIR \
     SHELL=/nix/profile/bin/fish \
