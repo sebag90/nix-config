@@ -25,6 +25,7 @@ ENV PATH=$VENV_DIR/bin:/nix/profile/bin:$PATH \
     DEVENV=1
 
 RUN mkdir -p $HOME_DIR/.local/share $HOME_DIR/.cache \
+    && ln -s /nix/profile/bin/podman /usr/local/bin/docker \
     && echo "ALL ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/container \
     && chmod 440 /etc/sudoers.d/container
 
