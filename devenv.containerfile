@@ -31,12 +31,12 @@ RUN mkdir -p $HOME_DIR/.local/share $HOME_DIR/.cache \
 
 RUN dnf install -y git openssh-clients && dnf clean all
 
-# install pi coding agent (bash, ca-certificates and ripgrep come from fedora + nix)
+# install pi coding agent and aws cli
 RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent \
-    && pi install npm:pi-ponytail
+    && pi install npm:pi-ponytail \
+    && curl -fsSL https://awscli.amazonaws.com/v2/install.sh | bash
 
 # any uid must be able to write to the home dir (podman --user)
-# keep this LAST: any RUN after it re-creates root-owned dirs under $HOME
 RUN uv venv $VENV_DIR \
     && chmod -R 777 $HOME_DIR
 
