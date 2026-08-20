@@ -61,10 +61,17 @@ Copy /nix from the container to the host
 `docker run --rm --entrypoint=tar ghcr.io/sebag90/devenv -C / -cf - nix | sudo tar -C / -xf -`
 
 ## Run as working environment:
-`podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) -v $(pwd):/workspace:Z -w /workspace ghcr.io/sebag90/devenv:latest`
+**Always pass `--passwd-entry`**: with `--userns=keep-id --user` podman writes a passwd entry whose
+home is the workdir, and `ssh` uses `pw_dir` (not `$HOME`), so `~/.ssh/config` is ignored and host
+aliases fail with `Could not resolve hostname <alias>`.
+```
+--passwd-entry 'dev:*:$UID:$GID::/home/dev:/nix/profile/bin/fish'
+```
+
+`podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) --passwd-entry 'dev:*:$UID:$GID::/home/dev:/nix/profile/bin/fish' -v $(pwd):/workspace:Z -w /workspace ghcr.io/sebag90/devenv:latest`
 
 with podman:
-`podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) -v $(pwd):/workspace:Z -w /workspace -v $XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock -e CONTAINER_HOST=unix:///run/podman/podman.sock --security-opt label=disable ghcr.io/sebag90/devenv:latest`
+`podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) --passwd-entry 'dev:*:$UID:$GID::/home/dev:/nix/profile/bin/fish' -v $(pwd):/workspace:Z -w /workspace -v $XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock -e CONTAINER_HOST=unix:///run/podman/podman.sock --security-opt label=disable ghcr.io/sebag90/devenv:latest`
 
 
-podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) -v $(pwd):/workspace:Z -w /workspace -v $XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock -e CONTAINER_HOST=unix:///run/podman/podman.sock -v ~/.pi/agent:/home/dev/.pi/agent:Z -v ~/.aws:/home/dev/.aws:Z --security-opt label=disable ciao
+podman run -it --rm --userns=keep-id --user $(id -u):$(id -g) --passwd-entry 'dev:*:$UID:$GID::/home/dev:/nix/profile/bin/fish' -v $(pwd):/workspace:Z -w /workspace -v $XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock -e CONTAINER_HOST=unix:///run/podman/podman.sock -v ~/.ssh:/home/dev/.ssh:ro -v ~/.pi/agent:/home/dev/.pi/agent:Z -v ~/.aws:/home/dev/.aws:Z --security-opt label=disable ciao
