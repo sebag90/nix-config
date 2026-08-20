@@ -2,7 +2,9 @@ ARG NIX_BASE=ghcr.io/sebag90/devenv-nix-base:latest
 
 FROM docker.io/alpine/git:latest as config
 WORKDIR /workspace
-RUN git clone https://github.com/sebag90/dotfiles.git
+# busts the clone layer whenever dotfiles HEAD moves
+ADD https://api.github.com/repos/sebag90/dotfiles/commits/main /tmp/dotfiles-head
+RUN git clone --depth 1 https://github.com/sebag90/dotfiles.git
 
 FROM ${NIX_BASE} AS nix_base
 
