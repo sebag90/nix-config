@@ -1,86 +1,47 @@
-FROM docker.io/nixos/nix AS builder
-
-RUN mkdir -p /etc/nix
-COPY <<EOF /etc/nix/nix.conf
-sandbox = false
-filter-syscalls = false
-experimental-features = nix-command flakes
-EOF
-
-WORKDIR /build-dir
-COPY flake.nix .
-COPY packages packages
-
-COPY <<'EOF' /build-dir/build_container.sh
-ARCH=$(uname -m)
-OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-SYSTEM="${ARCH}-${OS}"
-
-nix build \
-  --option sandbox false \
-  --option filter-syscalls false \
-  .#
-EOF
-
-RUN bash build_container.sh
-
-# remove conflicting packages
-RUN nix-env -e git-minimal
-RUN nix-env -e wget
-RUN nix-env -e man-db
-
-RUN nix-env -i ./result
-
-# clean installation
-RUN nix-store --gc
-RUN nix-collect-garbage -d
-
-# copy configs and bins
-# store
-RUN mkdir -p /out/nix/store \
- && nix-store -qR ./result \
- | xargs -I{} cp -r {} /out/nix/store
-
-# profiles
-RUN mkdir -p /out/nix/var/nix \
- && cp -r /nix/var/nix/profiles /out/nix/var/nix/
-
-# home
-RUN mkdir -p /out/root \
- && cp -r /root/.nix-profile /out/nix-profile
-
-FROM fedora AS aggregator
-# copy nix files
-COPY --from=builder /out/nix /nix
-COPY --from=builder /out/nix-profile /nix/profile
-
-# clean broken links
-RUN find /nix -xtype l -delete
+ARG NIX_BASE=ghcr.io/sebag90/devenv-nix-base:latest
 
 FROM docker.io/alpine/git:latest as config
 WORKDIR /workspace
-RUN git clone https://github.com/sebag90/dotfiles.git
+# busts the clone layer whenever dotfiles HEAD moves
+ADD https://api.github.com/repos/sebag90/dotfiles/commits/main /tmp/dotfiles-head
+RUN git clone --depth 1 https://github.com/sebag90/dotfiles.git
+
+FROM ${NIX_BASE} AS nix_base
 
 FROM fedora AS final
 
 ARG WORK_DIR=/workspace
-ARG CONFIG_DIR=/usr/local/share/config
-ARG DATA_DIR=/usr/local/share/data
-ARG CACHE_DIR=/usr/local/share/cache
+ARG HOME_DIR=/home/dev
+ARG VENV_DIR=/home/dev/venv
 
-COPY --from=aggregator /nix /nix
-COPY --from=config $WORK_DIR/dotfiles/config $CONFIG_DIR
+COPY --from=nix_base /nix /nix
+COPY --from=config /workspace/dotfiles/config $HOME_DIR/.config
 
-ENV PATH=/nix/profile/bin:$PATH \
+ENV PATH=$VENV_DIR/bin:/nix/profile/bin:$PATH \
     LANG=C.UTF-8 \
-    XDG_CONFIG_HOME=$CONFIG_DIR \
-    XDG_DATA_HOME=$DATA_DIR \
-    XDG_CACHE_HOME=$CACHE_DIR
+    HOME=$HOME_DIR \
+    XDG_CONFIG_HOME=$HOME_DIR/.config \
+    VIRTUAL_ENV=$VENV_DIR \
+    UV_PROJECT_ENVIRONMENT=$VENV_DIR \
+    SHELL=/nix/profile/bin/fish \
+    NPM_CONFIG_PREFIX=/usr/local \
+    DEVENV=1
 
-RUN mkdir -p $DATA_DIR $CACHE_DIR \
-    && chmod -R 777 $CONFIG_DIR $CACHE_DIR $DATA_DIR \
+RUN mkdir -p $HOME_DIR/.local/share $HOME_DIR/.cache \
+    && ln -s /nix/profile/bin/podman /usr/local/bin/docker \
     && echo "ALL ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/container \
     && chmod 440 /etc/sudoers.d/container
+
+RUN dnf install -y git openssh-clients which && dnf clean all
+
+# install pi coding agent and aws cli
+RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent \
+    && pi install npm:pi-ponytail \
+    && curl -fsSL https://awscli.amazonaws.com/v2/install.sh | bash
+
+# any uid must be able to write to the home dir (podman --user)
+RUN uv venv $VENV_DIR \
+    && chmod -R 777 $HOME_DIR
 
 WORKDIR $WORK_DIR
 ENTRYPOINT ["fish"]

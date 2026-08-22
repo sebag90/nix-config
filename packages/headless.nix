@@ -9,7 +9,7 @@ with pkgs; [
   wget
   curl
   bat
-  eza
+  lsd
   unzip
   serpl
   glow
@@ -17,6 +17,7 @@ with pkgs; [
   btop
   ctop
   ouch
+  ripgrep
   gdu
   stow
   zellij

@@ -1,4 +1,4 @@
-name: Build and Push sebos Container
+name: Build and Push devenv-nix-base Container
 
 on:
   workflow_dispatch:
@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -34,11 +37,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: distro.containerfile
-          platforms: linux/amd64
+          file: devenv-nix-base.containerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ steps.repo_owner.outputs.owner }}/sebos:latest
+            ghcr.io/${{ steps.repo_owner.outputs.owner }}/devenv-nix-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -54,6 +57,6 @@ jobs:
       - name: Cleanup Old GHCR Images
         uses: step-security/ghcr-cleanup-action@v1
         with:
-          packages: 'sebos'
+          packages: 'devenv-nix-base'
           keep-n-tagged: 3
           token: ${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
