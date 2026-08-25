@@ -8,5 +8,8 @@ RUN --mount=type=tmpfs,dst=/tmp \
 	&& tar -xzf /tmp/JuliaMono.tar.gz -C /usr/share/fonts/JuliaMono/ \
     && fc-cache -fv
 
+RUN dnf install -y lsd \
+	&& dnf clean all 
+
 COPY --from=nix /nix /nix
 RUN ["bootc", "container", "lint"]
