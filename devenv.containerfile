@@ -32,7 +32,7 @@ RUN mkdir -p $HOME_DIR/.local/share $HOME_DIR/.cache \
     && echo "ALL ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/container \
     && chmod 440 /etc/sudoers.d/container
 
-RUN dnf install -y git openssh-clients which && dnf clean all
+RUN dnf install -y git wl-clipboard openssh-clients which && dnf clean all
 
 # install pi coding agent and aws cli
 RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent \
