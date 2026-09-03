@@ -30,8 +30,17 @@ with pkgs; [
   helix.packages.${system}.default
   python313Packages.python-lsp-server
   python313Packages.jedi-language-server
+  just-lsp
+  texlab
   dockerfile-language-server
+  docker-compose-language-service
   gopls
+  nil
+  yaml-language-server
+  ansible-language-server
+  fish-lsp
+  systemd-lsp
+  marksman
 
   # programming tools
   podman
