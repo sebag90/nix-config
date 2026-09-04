@@ -36,7 +36,6 @@ with pkgs; [
   gopls
   nil
   yaml-language-server
-  ansible-language-server
   fish-lsp
   systemd-lsp
   marksman
