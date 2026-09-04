@@ -1,4 +1,5 @@
 ARG NIX_BASE=ghcr.io/sebag90/devenv-nix-base:latest
+ARG HELIX_IMAGE=ghcr.io/sebag90/helix:latest
 
 FROM docker.io/alpine/git:latest as config
 WORKDIR /workspace
@@ -7,6 +8,7 @@ ADD https://api.github.com/repos/sebag90/dotfiles/commits/main /tmp/dotfiles-hea
 RUN git clone --depth 1 https://github.com/sebag90/dotfiles.git
 
 FROM ${NIX_BASE} AS nix_base
+FROM ${HELIX_IMAGE} AS helix
 
 FROM fedora AS final
 
@@ -15,9 +17,12 @@ ARG HOME_DIR=/home/dev
 ARG VENV_DIR=/home/dev/venv
 
 COPY --from=nix_base /nix /nix
+COPY --from=helix /usr/local/bin/hx /usr/local/bin/hx
+COPY --from=helix /usr/local/share/helix /usr/local/share/helix
 COPY --from=config /workspace/dotfiles/config $HOME_DIR/.config
 
-ENV PATH=$VENV_DIR/bin:/nix/profile/bin:$PATH \
+ENV PATH=$VENV_DIR/bin:/nix/profile/bin:/usr/local/bin:$PATH \
+    HELIX_RUNTIME=/usr/local/share/helix/runtime \
     LANG=C.UTF-8 \
     HOME=$HOME_DIR \
     XDG_CONFIG_HOME=$HOME_DIR/.config \

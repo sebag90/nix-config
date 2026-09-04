@@ -1,4 +1,4 @@
-{ pkgs, helix, goosebutils, system }:
+{ pkgs, goosebutils, system }:
 with pkgs; [
   goosebutils
   goosebutils.packages.${system}.search
@@ -27,7 +27,6 @@ with pkgs; [
   delta
 
   # editor & lsps
-  helix.packages.${system}.default
   python313Packages.python-lsp-server
   python313Packages.jedi-language-server
   just-lsp

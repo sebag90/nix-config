@@ -1,4 +1,8 @@
-FROM ghcr.io/sebag90/devenv:latest as nix
+ARG HELIX_IMAGE=ghcr.io/sebag90/helix:latest
+ARG DEVENV_IMAGE=ghcr.io/sebag90/devenv:latest
+
+FROM ${HELIX_IMAGE} as helix
+FROM ${DEVENV_IMAGE} as nix
 FROM quay.io/fedora-ostree-desktops/silverblue:44
 
 RUN --mount=type=tmpfs,dst=/tmp \
@@ -9,7 +13,11 @@ RUN --mount=type=tmpfs,dst=/tmp \
     && fc-cache -fv
 
 RUN dnf install -y lsd \
-	&& dnf clean all 
+	&& dnf clean all
 
+COPY --from=helix /usr/local/bin/hx /usr/local/bin/hx
+COPY --from=helix /usr/local/share/helix /usr/local/share/helix
 COPY --from=nix /nix /nix
+
+ENV HELIX_RUNTIME=/usr/local/share/helix/runtime
 RUN ["bootc", "container", "lint"]

@@ -22,6 +22,8 @@ RUN git clone --depth 1 --branch "${HELIX_REF}" "${HELIX_REPO}" helix
 
 WORKDIR /src/helix
 
+ENV HELIX_DEFAULT_RUNTIME=/usr/local/share/helix/runtime
+
 # Build/install hx and the tree-sitter grammars.
 RUN cargo install \
         --path helix-term \

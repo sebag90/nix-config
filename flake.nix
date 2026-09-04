@@ -5,11 +5,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
 
-    helix.url = "github:helix-editor/helix";
     goosebutils.url = "github:sebag90/goosebutils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, helix, goosebutils, ... }:
+  outputs = { self, nixpkgs, flake-utils, goosebutils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
@@ -17,7 +16,7 @@
           config.allowUnfree = true;
         };
 
-        headlessPackages = import ./packages/headless.nix { inherit pkgs helix goosebutils system; };
+        headlessPackages = import ./packages/headless.nix { inherit pkgs goosebutils system; };
         # containerPackages = headlessPackages ++ import ./packages/container.nix { inherit pkgs; };
 
       in {
