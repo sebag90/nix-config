@@ -14,8 +14,8 @@ RUN --mount=type=tmpfs,dst=/tmp \
 RUN dnf install -y lsd fish \
 	&& dnf clean all
 
-COPY --from=helix /usr/local/bin/hx /usr/local/bin/hx
-COPY --from=helix /usr/local/share/helix /usr/local/share/helix
+COPY --from=helix /usr/local/bin/hx /usr/bin/hx
+COPY --from=helix /usr/local/share/helix /usr/share/helix
 
-ENV HELIX_RUNTIME=/usr/local/share/helix/runtime
+ENV HELIX_RUNTIME=/usr/share/helix/runtime
 RUN ["bootc", "container", "lint"]
